@@ -12,20 +12,36 @@ function swapLocale(pathname: string, target: Locale): string {
 
 export function LanguageSwitcher({ lang }: { lang: Locale }) {
   const pathname = usePathname();
-  const other: Locale = lang === "en" ? "pt" : "en";
-  const href = swapLocale(pathname, other);
 
-  function handleClick() {
-    document.cookie = `locale=${other}; path=/; max-age=${60 * 60 * 24 * 365}`;
+  function setCookie(target: Locale) {
+    document.cookie = `locale=${target}; path=/; max-age=${60 * 60 * 24 * 365}`;
   }
 
   return (
-    <Link
-      href={href}
-      onClick={handleClick}
-      className="text-sm text-muted hover:text-foreground transition-colors"
-    >
-      {other.toUpperCase()}
-    </Link>
+    <div className="flex items-center gap-1.5 text-sm">
+      <Link
+        href={swapLocale(pathname, "pt")}
+        onClick={() => setCookie("pt")}
+        className={
+          lang === "pt"
+            ? "font-medium underline underline-offset-4"
+            : "text-muted hover:text-foreground transition-colors"
+        }
+      >
+        PT
+      </Link>
+      <span className="text-muted">|</span>
+      <Link
+        href={swapLocale(pathname, "en")}
+        onClick={() => setCookie("en")}
+        className={
+          lang === "en"
+            ? "font-medium underline underline-offset-4"
+            : "text-muted hover:text-foreground transition-colors"
+        }
+      >
+        EN
+      </Link>
+    </div>
   );
 }

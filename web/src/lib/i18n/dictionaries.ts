@@ -5,6 +5,10 @@ const dictionaries = {
     nav: {
       home: "Posts",
       tags: "Tags",
+      about: "About",
+    },
+    about: {
+      title: "About me",
     },
     home: {
       featured: "Featured",
@@ -35,6 +39,10 @@ const dictionaries = {
     nav: {
       home: "Posts",
       tags: "Tags",
+      about: "Sobre",
+    },
+    about: {
+      title: "Sobre mim",
     },
     home: {
       featured: "Destaques",
