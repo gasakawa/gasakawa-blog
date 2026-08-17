@@ -9,13 +9,6 @@ import { groupPostsByMonth } from "@/lib/groupPosts";
 import { SearchBox } from "./SearchBox";
 import { TagPill } from "./TagPill";
 
-type View = "list" | "grid";
-
-function getInitialView(): View {
-  if (typeof window === "undefined") return "list";
-  return localStorage.getItem("postView") === "grid" ? "grid" : "list";
-}
-
 export function PostListView({
   posts,
   lang,
@@ -25,13 +18,7 @@ export function PostListView({
   lang: Locale;
   dict: Dictionary["home"];
 }) {
-  const [view, setView] = useState<View>(getInitialView);
   const [query, setQuery] = useState("");
-
-  function setViewPersist(next: View) {
-    setView(next);
-    localStorage.setItem("postView", next);
-  }
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -49,33 +36,12 @@ export function PostListView({
 
   return (
     <div>
-      <div className="flex items-center gap-4 mb-6">
+      <div className="mb-6">
         <SearchBox
           value={query}
           onChange={setQuery}
           placeholder={dict.searchPlaceholder}
         />
-        <div className="flex shrink-0 gap-2 text-sm">
-          <button
-            onClick={() => setViewPersist("list")}
-            suppressHydrationWarning
-            className={
-              view === "list" ? "font-medium underline" : "text-muted"
-            }
-          >
-            {dict.viewList}
-          </button>
-          <span className="text-muted">/</span>
-          <button
-            onClick={() => setViewPersist("grid")}
-            suppressHydrationWarning
-            className={
-              view === "grid" ? "font-medium underline" : "text-muted"
-            }
-          >
-            {dict.viewGrid}
-          </button>
-        </div>
       </div>
 
       {groups.length === 0 && (
@@ -89,14 +55,7 @@ export function PostListView({
           <h2 className="font-serif text-lg mb-4 text-muted">
             {group.label}
           </h2>
-          <ul
-            suppressHydrationWarning
-            className={
-              view === "grid"
-                ? "grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6"
-                : "flex flex-col gap-5"
-            }
-          >
+          <ul className="flex flex-col gap-5">
             {group.posts.map((post) => (
               <li key={post._id}>
                 <Link

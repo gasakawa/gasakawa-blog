@@ -41,32 +41,38 @@ export type Post = {
     alt?: string;
     _type: "image";
   };
-  body?: Array<{
-    children?: Array<{
-      marks?: Array<string>;
-      text?: string;
-      _type: "span";
-      _key: string;
-    }>;
-    style?: "normal" | "h2" | "h3" | "blockquote";
-    listItem?: "bullet" | "number";
-    markDefs?: Array<{
-      href?: string;
-      _type: "link";
-      _key: string;
-    }>;
-    level?: number;
-    _type: "block";
-    _key: string;
-  } | {
-    asset?: SanityImageAssetReference;
-    media?: unknown;
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    alt?: string;
-    _type: "image";
-    _key: string;
-  }>;
+  body?: Array<
+    | {
+        children?: Array<{
+          marks?: Array<string>;
+          text?: string;
+          _type: "span";
+          _key: string;
+        }>;
+        style?: "normal" | "h2" | "h3" | "h4" | "blockquote";
+        listItem?: "bullet" | "number";
+        markDefs?: Array<{
+          href?: string;
+          _type: "link";
+          _key: string;
+        }>;
+        level?: number;
+        _type: "block";
+        _key: string;
+      }
+    | {
+        asset?: SanityImageAssetReference;
+        media?: unknown;
+        hotspot?: SanityImageHotspot;
+        crop?: SanityImageCrop;
+        alt?: string;
+        _type: "image";
+        _key: string;
+      }
+    | ({
+        _key: string;
+      } & Code)
+  >;
   publishedAt?: string;
   tags?: Array<string>;
   featured?: boolean;
@@ -92,6 +98,14 @@ export type Slug = {
   _type: "slug";
   current?: string;
   source?: string;
+};
+
+export type Code = {
+  _type: "code";
+  language?: string;
+  filename?: string;
+  code?: string;
+  highlightedLines?: Array<number>;
 };
 
 export type SanityImagePaletteSwatch = {
@@ -191,7 +205,21 @@ export type Geopoint = {
   alt?: number;
 };
 
-export type AllSanitySchemaTypes = SanityImageAssetReference | Post | SanityImageCrop | SanityImageHotspot | Slug | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageMetadata | SanityFileAsset | SanityAssetSourceData | SanityImageAsset | Geopoint;
+export type AllSanitySchemaTypes =
+  | SanityImageAssetReference
+  | Post
+  | SanityImageCrop
+  | SanityImageHotspot
+  | Slug
+  | Code
+  | SanityImagePaletteSwatch
+  | SanityImagePalette
+  | SanityImageDimensions
+  | SanityImageMetadata
+  | SanityFileAsset
+  | SanityAssetSourceData
+  | SanityImageAsset
+  | Geopoint;
 
 // Source: ../web/src/sanity/queries.ts
 // Variable: POSTS_BY_LANG_QUERY
@@ -227,34 +255,45 @@ export type POST_QUERY_RESULT = {
     lqip: string | null;
     dimensions: SanityImageDimensions | null;
   } | null;
-  body: Array<{
-    children?: Array<{
-      marks?: Array<string>;
-      text?: string;
-      _type: "span";
-      _key: string;
-    }>;
-    style?: "blockquote" | "h2" | "h3" | "normal";
-    listItem?: "bullet" | "number";
-    markDefs?: Array<{
-      href?: string;
-      _type: "link";
-      _key: string;
-    }>;
-    level?: number;
-    _type: "block";
-    _key: string;
-  } | {
-    asset: SanityImageAssetReference | null;
-    media?: unknown;
-    hotspot: SanityImageHotspot | null;
-    crop: SanityImageCrop | null;
-    alt: string | null;
-    _type: "image";
-    _key: string;
-    lqip: string | null;
-    dimensions: SanityImageDimensions | null;
-  }> | null;
+  body: Array<
+    | {
+        children?: Array<{
+          marks?: Array<string>;
+          text?: string;
+          _type: "span";
+          _key: string;
+        }>;
+        style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+        listItem?: "bullet" | "number";
+        markDefs?: Array<{
+          href?: string;
+          _type: "link";
+          _key: string;
+        }>;
+        level?: number;
+        _type: "block";
+        _key: string;
+      }
+    | {
+        _key: string;
+        _type: "code";
+        language?: string;
+        filename?: string;
+        code?: string;
+        highlightedLines?: Array<number>;
+      }
+    | {
+        asset: SanityImageAssetReference | null;
+        media?: unknown;
+        hotspot: SanityImageHotspot | null;
+        crop: SanityImageCrop | null;
+        alt: string | null;
+        _type: "image";
+        _key: string;
+        lqip: string | null;
+        dimensions: SanityImageDimensions | null;
+      }
+  > | null;
 } | null;
 
 // Source: ../web/src/sanity/queries.ts
@@ -302,12 +341,11 @@ export type SITEMAP_POSTS_QUERY_RESULT = Array<{
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
-    "\n  *[_type == \"post\" && language == $lang && defined(slug.current)]\n  | order(publishedAt desc) {\n    _id,\n    title,\n    \"slug\": slug.current,\n    excerpt,\n    tags,\n    featured,\n    publishedAt,\n    translationKey\n  }\n": POSTS_BY_LANG_QUERY_RESULT;
-    "\n  *[_type == \"post\" && language == $lang && slug.current == $slug][0]{\n    _id,\n    title,\n    excerpt,\n    publishedAt,\n    tags,\n    translationKey,\n    language,\n    \"slug\": slug.current,\n    coverImage{\n      alt,\n      hotspot,\n      crop,\n      asset,\n      \"lqip\": asset->metadata.lqip,\n      \"dimensions\": asset->metadata.dimensions\n    },\n    body[]{\n      ...,\n      _type == \"image\" => {\n        alt,\n        hotspot,\n        crop,\n        asset,\n        \"lqip\": asset->metadata.lqip,\n        \"dimensions\": asset->metadata.dimensions\n      }\n    }\n  }\n": POST_QUERY_RESULT;
-    "\n  *[_type == \"post\" && translationKey == $translationKey && language != $language][0]{\n    \"slug\": slug.current,\n    language\n  }\n": POST_TRANSLATION_QUERY_RESULT;
-    "\n  *[_type == \"post\" && language == $lang && $tagName in tags]\n  | order(publishedAt desc) {\n    _id,\n    title,\n    \"slug\": slug.current,\n    excerpt,\n    tags,\n    featured,\n    publishedAt,\n    translationKey\n  }\n": POSTS_BY_TAG_QUERY_RESULT;
-    "\n  *[_type == \"post\" && language == $lang && defined(slug.current)]\n  | order(publishedAt desc) [0...20] {\n    title,\n    excerpt,\n    \"slug\": slug.current,\n    publishedAt\n  }\n": RSS_POSTS_QUERY_RESULT;
-    "\n  *[_type == \"post\" && defined(slug.current)]\n  | order(publishedAt desc) {\n    \"slug\": slug.current,\n    language,\n    publishedAt\n  }\n": SITEMAP_POSTS_QUERY_RESULT;
+    '\n  *[_type == "post" && language == $lang && defined(slug.current)]\n  | order(publishedAt desc) {\n    _id,\n    title,\n    "slug": slug.current,\n    excerpt,\n    tags,\n    featured,\n    publishedAt,\n    translationKey\n  }\n': POSTS_BY_LANG_QUERY_RESULT;
+    '\n  *[_type == "post" && language == $lang && slug.current == $slug][0]{\n    _id,\n    title,\n    excerpt,\n    publishedAt,\n    tags,\n    translationKey,\n    language,\n    "slug": slug.current,\n    coverImage{\n      alt,\n      hotspot,\n      crop,\n      asset,\n      "lqip": asset->metadata.lqip,\n      "dimensions": asset->metadata.dimensions\n    },\n    body[]{\n      ...,\n      _type == "image" => {\n        alt,\n        hotspot,\n        crop,\n        asset,\n        "lqip": asset->metadata.lqip,\n        "dimensions": asset->metadata.dimensions\n      }\n    }\n  }\n': POST_QUERY_RESULT;
+    '\n  *[_type == "post" && translationKey == $translationKey && language != $language][0]{\n    "slug": slug.current,\n    language\n  }\n': POST_TRANSLATION_QUERY_RESULT;
+    '\n  *[_type == "post" && language == $lang && $tagName in tags]\n  | order(publishedAt desc) {\n    _id,\n    title,\n    "slug": slug.current,\n    excerpt,\n    tags,\n    featured,\n    publishedAt,\n    translationKey\n  }\n': POSTS_BY_TAG_QUERY_RESULT;
+    '\n  *[_type == "post" && language == $lang && defined(slug.current)]\n  | order(publishedAt desc) [0...20] {\n    title,\n    excerpt,\n    "slug": slug.current,\n    publishedAt\n  }\n': RSS_POSTS_QUERY_RESULT;
+    '\n  *[_type == "post" && defined(slug.current)]\n  | order(publishedAt desc) {\n    "slug": slug.current,\n    language,\n    publishedAt\n  }\n': SITEMAP_POSTS_QUERY_RESULT;
   }
 }
-

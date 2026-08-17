@@ -1,5 +1,15 @@
 import { defineArrayMember, defineField, defineType } from 'sanity'
 
+const CODE_LANGUAGES = [
+  { title: 'JavaScript', value: 'javascript' },
+  { title: 'TypeScript', value: 'typescript' },
+  { title: 'JSON', value: 'json' },
+  { title: 'HTML', value: 'html' },
+  { title: 'CSS', value: 'css' },
+  { title: 'Shell', value: 'bash' },
+  { title: 'Plain text', value: 'text' },
+]
+
 export const post = defineType({
   name: 'post',
   title: 'Post',
@@ -85,6 +95,7 @@ export const post = defineType({
             { title: 'Normal', value: 'normal' },
             { title: 'H2', value: 'h2' },
             { title: 'H3', value: 'h3' },
+            { title: 'H4', value: 'h4' },
             { title: 'Quote', value: 'blockquote' },
           ],
           marks: {
@@ -117,6 +128,10 @@ export const post = defineType({
               validation: (Rule) => Rule.required(),
             }),
           ],
+        }),
+        defineArrayMember({
+          type: 'code',
+          options: { withFilename: false, languageAlternatives: CODE_LANGUAGES },
         }),
       ],
     }),

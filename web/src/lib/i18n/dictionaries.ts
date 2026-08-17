@@ -13,8 +13,6 @@ const dictionaries = {
     home: {
       featured: "Featured",
       onThisPage: "On this page",
-      viewList: "List",
-      viewGrid: "Grid",
       searchPlaceholder: "Search by title or tag…",
       noResults: "No posts match your search.",
       noPosts: "No posts yet.",
@@ -47,8 +45,6 @@ const dictionaries = {
     home: {
       featured: "Destaques",
       onThisPage: "Nesta página",
-      viewList: "Lista",
-      viewGrid: "Grade",
       searchPlaceholder: "Buscar por título ou tag…",
       noResults: "Nenhum post encontrado.",
       noPosts: "Ainda não há posts.",

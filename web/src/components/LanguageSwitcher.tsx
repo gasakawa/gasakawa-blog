@@ -28,7 +28,7 @@ export function LanguageSwitcher({ lang }: { lang: Locale }) {
             : "text-muted hover:text-foreground transition-colors"
         }
       >
-        PT
+        pt
       </Link>
       <span className="text-muted">|</span>
       <Link
@@ -40,7 +40,7 @@ export function LanguageSwitcher({ lang }: { lang: Locale }) {
             : "text-muted hover:text-foreground transition-colors"
         }
       >
-        EN
+        en
       </Link>
     </div>
   );

@@ -14,6 +14,12 @@ type SanityImageBlock = {
   crop?: unknown;
 };
 
+type SanityCodeBlock = {
+  code?: string | null;
+  language?: string | null;
+  filename?: string | null;
+};
+
 const components: PortableTextComponents = {
   types: {
     image: ({ value }: { value: SanityImageBlock }) => {
@@ -30,6 +36,14 @@ const components: PortableTextComponents = {
           blurDataURL={value.lqip ?? undefined}
           className="w-full h-auto"
         />
+      );
+    },
+    code: ({ value }: { value: SanityCodeBlock }) => {
+      if (!value?.code) return null;
+      return (
+        <pre className="overflow-x-auto rounded bg-zinc-900 p-4 text-sm text-zinc-100">
+          <code>{value.code}</code>
+        </pre>
       );
     },
   },

@@ -1,10 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useSyncExternalStore } from "react";
 
-function getInitialIsDark(): boolean {
-  if (typeof document === "undefined") return false;
+let listeners: Array<() => void> = [];
+
+function subscribe(listener: () => void) {
+  listeners.push(listener);
+  return () => {
+    listeners = listeners.filter((l) => l !== listener);
+  };
+}
+
+function notify() {
+  for (const listener of listeners) listener();
+}
+
+function getSnapshot() {
   return document.documentElement.classList.contains("dark");
+}
+
+function getServerSnapshot() {
+  return false;
 }
 
 function SunIcon() {
@@ -45,20 +61,19 @@ function MoonIcon() {
 }
 
 export function DarkModeToggle() {
-  const [isDark, setIsDark] = useState(getInitialIsDark);
+  const isDark = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   function toggle() {
     const next = !isDark;
     document.documentElement.classList.toggle("dark", next);
     localStorage.setItem("theme", next ? "dark" : "light");
-    setIsDark(next);
+    notify();
   }
 
   return (
     <button
       onClick={toggle}
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-      suppressHydrationWarning
       className="text-muted hover:text-foreground transition-colors"
     >
       {isDark ? <SunIcon /> : <MoonIcon />}
