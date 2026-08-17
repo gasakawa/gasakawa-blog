@@ -305,6 +305,11 @@ export type POST_TRANSLATION_QUERY_RESULT = {
 } | null;
 
 // Source: ../web/src/sanity/queries.ts
+// Variable: TRANSLATED_SLUG_QUERY
+// Query: *[_type == "post" && language == $lang && slug.current == $slug][0]{    "target": *[_type == "post" && language == $targetLang && translationKey == ^.translationKey][0].slug.current  }.target
+export type TRANSLATED_SLUG_QUERY_RESULT = string | null;
+
+// Source: ../web/src/sanity/queries.ts
 // Variable: POSTS_BY_TAG_QUERY
 // Query: *[_type == "post" && language == $lang && $tagName in tags]  | order(publishedAt desc) {    _id,    title,    "slug": slug.current,    excerpt,    tags,    featured,    publishedAt,    translationKey  }
 export type POSTS_BY_TAG_QUERY_RESULT = Array<{
@@ -344,6 +349,7 @@ declare module "@sanity/client" {
     '\n  *[_type == "post" && language == $lang && defined(slug.current)]\n  | order(publishedAt desc) {\n    _id,\n    title,\n    "slug": slug.current,\n    excerpt,\n    tags,\n    featured,\n    publishedAt,\n    translationKey\n  }\n': POSTS_BY_LANG_QUERY_RESULT;
     '\n  *[_type == "post" && language == $lang && slug.current == $slug][0]{\n    _id,\n    title,\n    excerpt,\n    publishedAt,\n    tags,\n    translationKey,\n    language,\n    "slug": slug.current,\n    coverImage{\n      alt,\n      hotspot,\n      crop,\n      asset,\n      "lqip": asset->metadata.lqip,\n      "dimensions": asset->metadata.dimensions\n    },\n    body[]{\n      ...,\n      _type == "image" => {\n        alt,\n        hotspot,\n        crop,\n        asset,\n        "lqip": asset->metadata.lqip,\n        "dimensions": asset->metadata.dimensions\n      }\n    }\n  }\n': POST_QUERY_RESULT;
     '\n  *[_type == "post" && translationKey == $translationKey && language != $language][0]{\n    "slug": slug.current,\n    language\n  }\n': POST_TRANSLATION_QUERY_RESULT;
+    '\n  *[_type == "post" && language == $lang && slug.current == $slug][0]{\n    "target": *[_type == "post" && language == $targetLang && translationKey == ^.translationKey][0].slug.current\n  }.target\n': TRANSLATED_SLUG_QUERY_RESULT;
     '\n  *[_type == "post" && language == $lang && $tagName in tags]\n  | order(publishedAt desc) {\n    _id,\n    title,\n    "slug": slug.current,\n    excerpt,\n    tags,\n    featured,\n    publishedAt,\n    translationKey\n  }\n': POSTS_BY_TAG_QUERY_RESULT;
     '\n  *[_type == "post" && language == $lang && defined(slug.current)]\n  | order(publishedAt desc) [0...20] {\n    title,\n    excerpt,\n    "slug": slug.current,\n    publishedAt\n  }\n': RSS_POSTS_QUERY_RESULT;
     '\n  *[_type == "post" && defined(slug.current)]\n  | order(publishedAt desc) {\n    "slug": slug.current,\n    language,\n    publishedAt\n  }\n': SITEMAP_POSTS_QUERY_RESULT;

@@ -53,6 +53,12 @@ export const POST_TRANSLATION_QUERY = defineQuery(`
   }
 `);
 
+export const TRANSLATED_SLUG_QUERY = defineQuery(`
+  *[_type == "post" && language == $lang && slug.current == $slug][0]{
+    "target": *[_type == "post" && language == $targetLang && translationKey == ^.translationKey][0].slug.current
+  }.target
+`);
+
 export const POSTS_BY_TAG_QUERY = defineQuery(`
   *[_type == "post" && language == $lang && $tagName in tags]
   | order(publishedAt desc) {
