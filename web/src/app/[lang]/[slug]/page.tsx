@@ -14,11 +14,22 @@ import { TranslationLink } from "@/components/TranslationLink";
 
 const options = { next: { revalidate: 3600 } };
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
 async function getPost(locale: Locale, slug: string) {
   return client.fetch(
     POST_QUERY,
     { lang: locale, slug },
     { ...options, next: { ...options.next, tags: [`posts:${locale}`] } }
+  );
+}
+
+async function getTranslation(translationKey: string | null, locale: Locale) {
+  if (!translationKey) return null;
+  return client.fetch(
+    POST_TRANSLATION_QUERY,
+    { translationKey, language: locale },
+    { ...options, next: { ...options.next, tags: [`post:${translationKey}`] } }
   );
 }
 
@@ -33,9 +44,36 @@ export async function generateMetadata({
   const post = await getPost(lang, slug);
   if (!post) return {};
 
+  const translation = await getTranslation(post.translationKey, lang);
+
+  const languages: Record<string, string> = {
+    [lang]: `/${lang}/${slug}`,
+  };
+  if (translation?.slug && translation.language) {
+    languages[translation.language] = `/${translation.language}/${translation.slug}`;
+  }
+
   return {
     title: post.title,
     description: post.excerpt ?? undefined,
+    alternates: {
+      canonical: `/${lang}/${slug}`,
+      languages,
+      types: {
+        "application/rss+xml": [
+          { url: "/en/rss.xml", title: "gasakawa blog (EN)" },
+          { url: "/pt/rss.xml", title: "gasakawa blog (PT)" },
+        ],
+      },
+    },
+    openGraph: {
+      title: post.title ?? undefined,
+      description: post.excerpt ?? undefined,
+      url: `${SITE_URL}/${lang}/${slug}`,
+      type: "article",
+      publishedTime: post.publishedAt ?? undefined,
+      locale: lang,
+    },
   };
 }
 
@@ -52,16 +90,28 @@ export default async function PostPage({
   const post = await getPost(locale, slug);
   if (!post) notFound();
 
-  const translation = post.translationKey
-    ? await client.fetch(
-        POST_TRANSLATION_QUERY,
-        { translationKey: post.translationKey, language: locale },
-        { ...options, next: { ...options.next, tags: [`post:${post.translationKey}`] } }
-      )
-    : null;
+  const translation = await getTranslation(post.translationKey, locale);
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    description: post.excerpt ?? undefined,
+    datePublished: post.publishedAt ?? undefined,
+    inLanguage: locale,
+    url: `${SITE_URL}/${locale}/${slug}`,
+    author: { "@type": "Person", name: "Gabriel Asakawa" },
+    ...(post.coverImage?.asset && {
+      image: urlFor(post.coverImage).width(1200).fit("max").url(),
+    }),
+  };
 
   return (
     <article className="mx-auto max-w-3xl px-6 py-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Link
         href={`/${locale}`}
         className="text-sm text-muted hover:text-foreground"

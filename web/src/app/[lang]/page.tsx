@@ -20,7 +20,19 @@ export async function generateMetadata({
   const { lang } = await params;
   if (!isLocale(lang)) return {};
   const dict = getDictionary(lang);
-  return { title: dict.nav.home };
+  return {
+    title: dict.nav.home,
+    alternates: {
+      canonical: `/${lang}`,
+      languages: { en: "/en", pt: "/pt" },
+      types: {
+        "application/rss+xml": [
+          { url: "/en/rss.xml", title: "gasakawa blog (EN)" },
+          { url: "/pt/rss.xml", title: "gasakawa blog (PT)" },
+        ],
+      },
+    },
+  };
 }
 
 export default async function HomePage({
