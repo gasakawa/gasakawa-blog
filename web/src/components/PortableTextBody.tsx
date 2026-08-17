@@ -1,7 +1,18 @@
 import { PortableText, type PortableTextComponents } from "next-sanity";
 import Image from "next/image";
 import type { ComponentProps } from "react";
+import { codeToHtml } from "shiki";
 import { urlFor } from "@/sanity/image";
+
+const SHIKI_THEME = "github-dark";
+const SHIKI_LANGS = new Set([
+  "javascript",
+  "typescript",
+  "json",
+  "html",
+  "css",
+  "bash",
+]);
 
 type PortableTextValue = ComponentProps<typeof PortableText>["value"];
 
@@ -15,41 +26,57 @@ type SanityImageBlock = {
 };
 
 type SanityCodeBlock = {
+  _key: string;
   code?: string | null;
   language?: string | null;
   filename?: string | null;
 };
 
-const components: PortableTextComponents = {
-  types: {
-    image: ({ value }: { value: SanityImageBlock }) => {
-      if (!value?.asset) return null;
-      const width = value.dimensions?.width ?? 1200;
-      const height = value.dimensions?.height ?? 800;
-      return (
-        <Image
-          src={urlFor(value).width(1200).fit("max").url()}
-          alt={value.alt ?? ""}
-          width={width}
-          height={height}
-          placeholder={value.lqip ? "blur" : undefined}
-          blurDataURL={value.lqip ?? undefined}
-          className="w-full h-auto"
-        />
-      );
-    },
-    code: ({ value }: { value: SanityCodeBlock }) => {
-      if (!value?.code) return null;
-      return (
-        <pre className="overflow-x-auto rounded bg-zinc-900 p-4 text-sm text-zinc-100">
-          <code>{value.code}</code>
-        </pre>
-      );
-    },
-  },
-};
+export async function PortableTextBody({ value }: { value: PortableTextValue }) {
+  const nodes = Array.isArray(value) ? (value as unknown[]) : [];
 
-export function PortableTextBody({ value }: { value: PortableTextValue }) {
+  const highlighted = new Map<string, string>();
+  await Promise.all(
+    nodes.map(async (node) => {
+      const block = node as Partial<SanityCodeBlock> & { _type?: string };
+      if (block._type !== "code" || typeof block.code !== "string" || !block._key) return;
+      const lang = SHIKI_LANGS.has(block.language ?? "") ? block.language! : "text";
+      const html = await codeToHtml(block.code, { lang, theme: SHIKI_THEME });
+      highlighted.set(block._key, html);
+    }),
+  );
+
+  const components: PortableTextComponents = {
+    types: {
+      image: ({ value }: { value: SanityImageBlock }) => {
+        if (!value?.asset) return null;
+        const width = value.dimensions?.width ?? 1200;
+        const height = value.dimensions?.height ?? 800;
+        return (
+          <Image
+            src={urlFor(value).width(1200).fit("max").url()}
+            alt={value.alt ?? ""}
+            width={width}
+            height={height}
+            placeholder={value.lqip ? "blur" : undefined}
+            blurDataURL={value.lqip ?? undefined}
+            className="w-full h-auto"
+          />
+        );
+      },
+      code: ({ value }: { value: SanityCodeBlock }) => {
+        const html = highlighted.get(value._key);
+        if (!html) return null;
+        return (
+          <div
+            className="overflow-x-auto rounded text-sm [&>pre]:p-4"
+            dangerouslySetInnerHTML={{ __html: html }}
+          />
+        );
+      },
+    },
+  };
+
   return (
     <div className="prose">
       <PortableText value={value} components={components} />
