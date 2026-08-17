@@ -47,6 +47,11 @@ export async function PortableTextBody({ value }: { value: PortableTextValue }) 
   );
 
   const components: PortableTextComponents = {
+    block: {
+      h2: ({ children, value }) => <h2 id={value._key}>{children}</h2>,
+      h3: ({ children, value }) => <h3 id={value._key}>{children}</h3>,
+      h4: ({ children, value }) => <h4 id={value._key}>{children}</h4>,
+    },
     types: {
       image: ({ value }: { value: SanityImageBlock }) => {
         if (!value?.asset) return null;

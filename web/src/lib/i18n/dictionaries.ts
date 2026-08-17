@@ -20,6 +20,7 @@ const dictionaries = {
     post: {
       readIn: "Read in Portuguese",
       backToPosts: "← Back to posts",
+      onThisPage: "On this page",
     },
     tag: {
       postsTagged: "Posts tagged",
@@ -52,6 +53,7 @@ const dictionaries = {
     post: {
       readIn: "Ler em inglês",
       backToPosts: "← Voltar aos posts",
+      onThisPage: "Nesta página",
     },
     tag: {
       postsTagged: "Posts marcados com",
