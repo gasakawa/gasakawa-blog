@@ -22,11 +22,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: {
-    default: "gasakawa blog",
-    template: "%s · gasakawa blog",
-  },
-  description: "A personal, bilingual blog.",
+  // No `template` here: [lang]/layout.tsx defines the real title template
+  // for every actual page, and Next.js chains templates through every
+  // ancestor layout — a template here would double-wrap it.
+  title: "Programming and Design | Gabriel Asakawa",
+  description:
+    "Personal blog by Gabriel Asakawa on software architecture, developer tools, and AI — with occasional detours into design and basketball.",
 };
 
 const NO_FOUC_SCRIPT = `(function(){try{var s=localStorage.getItem('theme');var d=s?s==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.classList.toggle('dark',d)}catch(e){}})()`;

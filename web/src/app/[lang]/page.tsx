@@ -19,9 +19,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { lang } = await params;
   if (!isLocale(lang)) return {};
-  const dict = getDictionary(lang);
   return {
-    title: dict.nav.home,
     alternates: {
       canonical: `/${lang}`,
       languages: { en: "/en", pt: "/pt" },

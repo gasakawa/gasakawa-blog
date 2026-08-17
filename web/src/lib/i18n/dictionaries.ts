@@ -2,6 +2,11 @@ import type { Locale } from "./locales";
 
 const dictionaries = {
   en: {
+    meta: {
+      title: "Programming and Design | Gabriel Asakawa",
+      description:
+        "Personal blog by Gabriel Asakawa on software architecture, developer tools, and AI — with occasional detours into design and basketball.",
+    },
     nav: {
       home: "Posts",
       tags: "Tags",
@@ -35,6 +40,11 @@ const dictionaries = {
     },
   },
   pt: {
+    meta: {
+      title: "Programação e Design | Gabriel Asakawa",
+      description:
+        "Blog pessoal de Gabriel Asakawa sobre arquitetura de software, ferramentas de desenvolvimento e IA — com alguns desvios para design e basquete.",
+    },
     nav: {
       home: "Posts",
       tags: "Tags",

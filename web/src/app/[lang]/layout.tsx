@@ -18,7 +18,14 @@ export async function generateMetadata({
   const { lang } = await params;
   if (!isLocale(lang)) return {};
 
+  const dict = getDictionary(lang);
+
   return {
+    title: {
+      default: dict.meta.title,
+      template: `%s · ${dict.meta.title}`,
+    },
+    description: dict.meta.description,
     alternates: {
       types: {
         "application/rss+xml": [
