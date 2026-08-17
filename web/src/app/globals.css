@@ -1,32 +1,39 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fafaf9;
-  --foreground: #1c1917;
-  --muted: #78716c;
-  --border: #e7e5e4;
-  --accent: #1c1917;
-  --pill-bg: #f0efed;
+  --background: #fafaf8;
+  --surface: #f1f0ea;
+  --foreground: #17181a;
+  --muted: #4a4c50;
+  --border: #e3e1db;
+  --accent: #c4622a;
+  --pill-bg: #f3e3d6;
 }
 
 .dark {
-  --background: #17140f;
-  --foreground: #ede9e3;
-  --muted: #a39e97;
-  --border: #2e2a24;
-  --accent: #ede9e3;
-  --pill-bg: #24201a;
+  --background: #14181a;
+  --surface: #1c2224;
+  --foreground: #f2f1ec;
+  --muted: #a9adae;
+  --border: #2a2f31;
+  --accent: #e38b54;
+  --pill-bg: #33241a;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
   --color-border: var(--border);
   --color-accent: var(--accent);
   --color-pill: var(--pill-bg);
-  --font-sans: var(--font-geist-sans);
-  --font-serif: Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-body);
+  /* --font-serif is the site's display/heading token (used via the
+     `font-serif` utility across headings/nav); it now points at
+     Space Grotesk rather than an actual serif, kept as-is so every
+     existing `font-serif` reference stays wired up. */
+  --font-serif: var(--font-display);
   --font-mono: var(--font-geist-mono);
 }
 
@@ -35,8 +42,39 @@ body {
   color: var(--foreground);
 }
 
+h1 {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: clamp(34px, 6vw, 48px);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+/* Section headings (e.g. the month groupings in the post list) vs. the
+   eyebrow-style labels (e.g. the "on this page" toc heading) share the
+   <h2> tag but read as different scales, so they're split on whether
+   they already carry the font-serif utility. */
+h2.font-serif {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 28px;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+h2:not(.font-serif) {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
 .prose {
   max-width: 65ch;
+  font-family: var(--font-sans);
+  font-size: 17px;
+  font-weight: 400;
   line-height: 1.75;
 }
 
@@ -45,9 +83,22 @@ body {
   margin-bottom: 1.25em;
 }
 
+.prose strong {
+  font-weight: 500;
+}
+
+.prose code:not(pre code) {
+  background: var(--surface);
+  border-radius: 0.25rem;
+  padding: 0.15em 0.45em;
+}
+
 .prose h2 {
   font-family: var(--font-serif);
-  font-size: 1.5em;
+  font-weight: 600;
+  font-size: 28px;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
   margin-top: 2em;
   margin-bottom: 0.75em;
 }
@@ -67,8 +118,14 @@ body {
 }
 
 .prose a {
+  color: var(--foreground);
   text-decoration: underline;
+  text-decoration-color: var(--accent);
   text-underline-offset: 3px;
+}
+
+.prose a:hover {
+  color: var(--accent);
 }
 
 .prose img {
